@@ -1,7 +1,8 @@
-package ca.uqac.liara.imurecording;
+package ca.uqac.liara.imurecording.Adapters;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +17,7 @@ import org.w3c.dom.Text;
 
 import java.util.List;
 
+import ca.uqac.liara.imurecording.R;
 import ca.uqac.liara.imurecording.Utils.StringUtils;
 
 /**
@@ -38,7 +40,7 @@ public class DeviceAdapter extends BaseAdapter {
     }
 
     @Override
-    public Object getItem(int position) {
+    public RxBleDevice getItem(int position) {
         return data.get(position);
     }
 
@@ -66,14 +68,16 @@ public class DeviceAdapter extends BaseAdapter {
         RxBleDevice device = (RxBleDevice) getItem(position);
         holder.name.setText(device.getName());
         holder.address.setText(device.getMacAddress());
-        holder.connectionState.setText(StringUtils.getConnectionStateDescription(device.getConnectionState().toString()));
+
+        String connectionStateValue = StringUtils.getConnectionStateDescription(device.getConnectionState().toString());
+        StringUtils.setConnectionStateValue(holder.connectionState, connectionStateValue);
 
         return convertView;
     }
 
     public class ViewHolder {
-        TextView name;
-        TextView address;
-        TextView connectionState;
+        public TextView name;
+        public TextView address;
+        public TextView connectionState;
     }
 }

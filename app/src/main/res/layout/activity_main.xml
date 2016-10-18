@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/activity_main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -16,17 +18,37 @@
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:layout_above="@+id/btn_layout" />
+
     <LinearLayout
         android:id="@id/btn_layout"
         android:layout_height="wrap_content"
         android:layout_width="fill_parent"
         android:orientation="horizontal"
-        android:layout_alignParentBottom="true">
-        <Button
-            android:id="@+id/btn_scan"
+        android:gravity="center_horizontal"
+        android:padding="8dp"
+        android:clipChildren="false"
+        android:clipToPadding="false"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true">
+
+        <com.github.jorgecastilloprz.FABProgressCircle
+            android:id="@+id/fabProgressCircle"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1" />
+            app:arcColor="@color/colorPrimaryDark"
+            android:layout_height="wrap_content">
+
+            <android.support.design.widget.FloatingActionButton
+                android:id="@+id/fab"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_bluetooth"
+                app:rippleColor="@color/colorPrimaryDark"
+                android:backgroundTint="@color/colorPrimary"
+                app:elevation="4dp"
+                app:borderWidth="0dp"/>
+
+        </com.github.jorgecastilloprz.FABProgressCircle>
+
     </LinearLayout>
 
 </RelativeLayout>
