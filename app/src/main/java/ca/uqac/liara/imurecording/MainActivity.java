@@ -1,11 +1,11 @@
 package ca.uqac.liara.imurecording;
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 
@@ -16,7 +16,8 @@ import com.polidea.rxandroidble.RxBleDevice;
 import java.util.ArrayList;
 import java.util.List;
 
-import ca.uqac.liara.imurecording.Adapters.DeviceAdapter;
+import ca.uqac.liara.imurecording.Adapters.AvailableDeviceAdapter;
+import ca.uqac.liara.imurecording.Adapters.PairedDeviceAdapter;
 import ca.uqac.liara.imurecording.Utils.StringUtils;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
@@ -27,15 +28,21 @@ public class MainActivity extends AppCompatActivity {
     private static final int REQUEST_ENABLE_BLUETOOTH = 201;
 
     private RelativeLayout layout;
-    private ListView listView;
+    private ListView availableDevicesList;
+    private ListView pairedDevicesList;
     private FABProgressCircle scanButton;
 
     private RxBleClient rxBleClient;
-    private Subscription scanSubscription;
-    private Subscription connectionSubscription;
 
-    private DeviceAdapter adapter;
-    private List<RxBleDevice> devices;
+    private Subscription scanAvailableDevices;
+    private Subscription scanPairedDevices;
+    private Subscription connectAvailableDevice;
+
+    private AvailableDeviceAdapter availableDeviceAdapter;
+    private PairedDeviceAdapter pairedDeviceAdapter;
+
+    private List<RxBleDevice> pairedDevices;
+    private List<RxBleDevice> availableDevices;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,10 +50,11 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         initGUI();
+        getPairedBLEDevices();
 
         scanButton.setOnClickListener(
                 v -> {
-                    if (scanSubscription == null) {
+                    if (scanAvailableDevices == null) {
                         startBLEScan();
                     } else {
                         stopBLESCAN();
@@ -54,9 +62,15 @@ public class MainActivity extends AppCompatActivity {
                 }
         );
 
-        listView.setOnItemClickListener(
-                (parent, view, position, id) -> subscribeBLEDevice(view, adapter.getItem(position))
+        availableDevicesList.setOnItemClickListener(
+                (parent, view, position, id) -> subscribeBLEDevice(view, availableDeviceAdapter.getItem(position))
         );
+
+        pairedDeviceAdapter.setListener(
+                position -> unsubscribeBLEDevice()
+        );
+
+
     }
 
     @Override
@@ -64,30 +78,38 @@ public class MainActivity extends AppCompatActivity {
         super.onPause();
 
         stopBLESCAN();
-        unsubscribeBLEDevice();
+//        unsubscribeBLEDevice();
     }
 
     private void initGUI() {
         layout = (RelativeLayout) findViewById(R.id.activity_main);
-        listView = (ListView) findViewById(R.id.list);
-        scanButton = (FABProgressCircle) findViewById(R.id.fabProgressCircle);
+        pairedDevicesList = (ListView) findViewById(R.id.paired_devices);
+        availableDevicesList = (ListView) findViewById(R.id.available_devices);
+        scanButton = (FABProgressCircle) findViewById(R.id.btn_scan);
 
-        devices = new ArrayList<>();
+        pairedDevices = new ArrayList<>();
+        availableDevices = new ArrayList<>();
+
         rxBleClient = rxBleClient.create(this);
 
-        adapter = new DeviceAdapter(this, devices);
-        listView.setAdapter(adapter);
+        pairedDeviceAdapter = new PairedDeviceAdapter(this, pairedDevices);
+        pairedDevicesList.setAdapter(pairedDeviceAdapter);
+        availableDeviceAdapter = new AvailableDeviceAdapter(this, availableDevices);
+        availableDevicesList.setAdapter(availableDeviceAdapter);
     }
 
     private void startBLEScan() {
         scanButton.show();
-        scanSubscription = rxBleClient.scanBleDevices()
+        scanAvailableDevices = rxBleClient.scanBleDevices()
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
                         rxBleScanResult -> {
-                            if (!devices.contains(rxBleScanResult.getBleDevice())) {
-                                devices.add(rxBleScanResult.getBleDevice());
-                                adapter.notifyDataSetChanged();
+                            RxBleDevice device = rxBleScanResult.getBleDevice();
+                            String connectionStateValue = StringUtils.getConnectionStateDescription(device.getConnectionState().toString());
+                            if (!availableDevices.contains(rxBleScanResult.getBleDevice()) &&
+                                    (connectionStateValue != "CONNECTED" || connectionStateValue != "CONNECTING")) {
+                                availableDevices.add(device);
+                                availableDeviceAdapter.notifyDataSetChanged();
                             }
                         },
                         throwable -> {
@@ -97,26 +119,55 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void stopBLESCAN() {
-        if (scanSubscription != null) {
+        if (scanAvailableDevices != null) {
             scanButton.hide();
-            scanSubscription.unsubscribe();
-            scanSubscription = null;
+            scanAvailableDevices.unsubscribe();
+            scanAvailableDevices = null;
         }
     }
 
-    private void subscribeBLEDevice(View view, RxBleDevice device) {
-        DeviceAdapter.ViewHolder holder = (DeviceAdapter.ViewHolder) view.getTag();
+    private void getPairedBLEDevices() {
+        Handler handler = new Handler();
+        handler.postDelayed(() -> {
+            Log.e("TEST", "ICI");
+            scanPairedDevices = rxBleClient.scanBleDevices()
+                    .subscribe(
+                            rxBleScanResult -> {
+                                RxBleDevice device = rxBleScanResult.getBleDevice();
+                                String connectionStateValue = StringUtils.getConnectionStateDescription(device.getConnectionState().toString());
+                                if (connectionStateValue == "CONNECTED" ||
+                                        connectionStateValue == "CONNECTING") {
+                                    pairedDevices.add(device);
+                                    pairedDeviceAdapter.notifyDataSetChanged();
+                                }
+                            },
+                            throwable -> {
+                                Snackbar.make(layout, throwable.toString(), Snackbar.LENGTH_LONG);
+                            }
+                    );
+        }, 100);
+        return;
+    }
 
-        connectionSubscription = device.establishConnection(MainActivity.this, false)
+    private void subscribeBLEDevice(View view, RxBleDevice device) {
+        AvailableDeviceAdapter.ViewHolder availableDeviceHolder = (AvailableDeviceAdapter.ViewHolder) view.getTag();
+
+        unsubscribeBLEDevice();
+
+        connectAvailableDevice = device.establishConnection(MainActivity.this, false)
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnUnsubscribe(() -> {
                     String connectionStateValue = StringUtils.getConnectionStateDescription(device.getConnectionState().toString());
-                    StringUtils.setConnectionStateValue(holder.connectionState, connectionStateValue);
+                    StringUtils.setConnectionStateValue(availableDeviceHolder.connectionState, connectionStateValue);
                 })
                 .subscribe(
                         rxBleConnection -> {
                             String connectionStateValue = StringUtils.getConnectionStateDescription(device.getConnectionState().toString());
-                            StringUtils.setConnectionStateValue(holder.connectionState, connectionStateValue);
+                            StringUtils.setConnectionStateValue(availableDeviceHolder.connectionState, connectionStateValue);
+                            pairedDevices.add(device);
+                            availableDevices.remove(device);
+                            pairedDeviceAdapter.notifyDataSetChanged();
+                            availableDeviceAdapter.notifyDataSetChanged();
                         },
                         throwable -> {
                             Snackbar.make(layout, throwable.toString(), Snackbar.LENGTH_LONG);
@@ -125,9 +176,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void unsubscribeBLEDevice() {
-        if (connectionSubscription != null && adapter != null) {
-            connectionSubscription.unsubscribe();
-            adapter.notifyDataSetChanged();
+        if (connectAvailableDevice != null && availableDeviceAdapter != null) {
+            connectAvailableDevice.unsubscribe();
+            pairedDevices.clear();
+            availableDeviceAdapter.notifyDataSetChanged();
+            pairedDeviceAdapter.notifyDataSetChanged();
         }
     }
 }

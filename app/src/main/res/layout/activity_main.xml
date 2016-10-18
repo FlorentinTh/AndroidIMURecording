@@ -12,12 +12,43 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="ca.uqac.liara.imurecording.MainActivity">
 
-    <ListView
-        android:id="@+id/list"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:layout_above="@+id/btn_layout" />
+    <LinearLayout
+        android:layout_above="@+id/btn_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="fill_parent"
+        android:orientation="vertical"
+        android:gravity="center_horizontal">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAllCaps="true"
+            android:textAlignment="center"
+            android:textColor="@color/colorPrimaryText"
+            android:text="@string/paired_devices_label" />
+
+        <ListView
+            android:id="@+id/paired_devices"
+            android:layout_width="fill_parent"
+            android:layout_height="0dp"
+            android:layout_weight="0.25" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAllCaps="true"
+            android:textAlignment="center"
+            android:textColor="@color/colorPrimaryText"
+            android:text="@string/available_devices_label" />
+
+        <ListView
+            android:id="@+id/available_devices"
+            android:layout_width="fill_parent"
+            android:layout_height="0dp"
+            android:layout_weight="0.5" />
+
+    </LinearLayout>
+
 
     <LinearLayout
         android:id="@id/btn_layout"
@@ -32,9 +63,9 @@
         android:layout_alignParentStart="true">
 
         <com.github.jorgecastilloprz.FABProgressCircle
-            android:id="@+id/fabProgressCircle"
+            android:id="@+id/btn_scan"
             android:layout_width="wrap_content"
-            app:arcColor="@color/colorPrimaryDark"
+            app:arcColor="@color/colorAccent"
             android:layout_height="wrap_content">
 
             <android.support.design.widget.FloatingActionButton
@@ -42,9 +73,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/ic_bluetooth"
-                app:rippleColor="@color/colorPrimaryDark"
+                app:rippleColor="@color/colorAccent"
                 android:backgroundTint="@color/colorPrimary"
-                app:elevation="4dp"
+                app:elevation="5dp"
                 app:borderWidth="0dp"/>
 
         </com.github.jorgecastilloprz.FABProgressCircle>
