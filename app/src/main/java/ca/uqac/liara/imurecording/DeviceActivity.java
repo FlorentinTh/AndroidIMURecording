@@ -5,6 +5,7 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -13,6 +14,7 @@ import android.support.annotation.RequiresApi;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
@@ -26,6 +28,7 @@ import java.util.List;
 
 import ca.uqac.liara.imurecording.Adapters.AvailableDeviceAdapter;
 import ca.uqac.liara.imurecording.Adapters.PairedDeviceAdapter;
+import ca.uqac.liara.imurecording.Utils.AndroidUtils;
 import ca.uqac.liara.imurecording.Utils.StringUtils;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
@@ -54,10 +57,14 @@ public class DeviceActivity extends AppCompatActivity {
     private List<RxBleDevice> pairedDevices;
     private List<RxBleDevice> availableDevices;
 
+    private SharedPreferences sharedPreferences;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_device);
+
+        sharedPreferences = this.getSharedPreferences(getResources().getString(R.string.shared_preference_file), Context.MODE_PRIVATE);
 
         rxBleClient = RxBleClient.create(this);
 
@@ -111,10 +118,16 @@ public class DeviceActivity extends AppCompatActivity {
 
         pairedDeviceAdapter.setOnUseButtonClickListener(
                 position -> {
-                    /**
-                     * TODO
-                     * start new Activity
-                     */
+                    RxBleDevice device = pairedDeviceAdapter.getItem(position);
+
+                    try {
+                        AndroidUtils.writeSharedPreferences(sharedPreferences, getResources().getString(R.string.device_name_key_value), device.getName());
+                        AndroidUtils.writeSharedPreferences(sharedPreferences, getResources().getString(R.string.device_mac_address_key_value), device.getMacAddress());
+                    } catch (Exception e) {
+                        Log.e(DeviceActivity.class.toString(), e.getMessage());
+                    }
+
+                    startActivity(new Intent(getApplicationContext(), CommunicationActivity.class));
                 }
         );
 
@@ -163,7 +176,8 @@ public class DeviceActivity extends AppCompatActivity {
                     builder.setMessage(R.string.alert_bluetooth_access_denied_message);
                     builder.setCancelable(true);
                     builder.setPositiveButton(android.R.string.ok, null);
-                    builder.setOnDismissListener(dialog -> {});
+                    builder.setOnDismissListener(dialog -> {
+                    });
                     builder.show();
                 }
                 break;
@@ -182,7 +196,8 @@ public class DeviceActivity extends AppCompatActivity {
                     builder.setMessage(R.string.alert_location_permission_denied_message);
                     builder.setCancelable(true);
                     builder.setPositiveButton(android.R.string.ok, null);
-                    builder.setOnDismissListener(dialog -> {});
+                    builder.setOnDismissListener(dialog -> {
+                    });
                     builder.show();
                 }
                 break;

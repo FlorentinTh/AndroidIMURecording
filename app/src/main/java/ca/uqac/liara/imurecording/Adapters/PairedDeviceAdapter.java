@@ -113,7 +113,7 @@ public class PairedDeviceAdapter extends BaseSwipeAdapter {
     public RxBleDevice getItem(int position) {
         return data.get(position);
     }
-
+    
     @Override
     public long getItemId(int position) {
         return data.indexOf(data.get(position));

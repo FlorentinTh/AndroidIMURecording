@@ -55,8 +55,7 @@
         android:layout_height="wrap_content"
         android:layout_width="fill_parent"
         android:orientation="horizontal"
-        android:gravity="center_horizontal"
-        android:padding="8dp"
+        android:gravity="bottom|right"
         android:clipChildren="false"
         android:clipToPadding="false"
         android:layout_alignParentBottom="true"
@@ -70,11 +69,11 @@
 
             <android.support.design.widget.FloatingActionButton
                 android:id="@+id/fab"
+                android:layout_margin="@dimen/fab_margin"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/ic_bluetooth"
-                app:rippleColor="@color/colorAccent"
-                android:backgroundTint="@color/colorPrimary"
+                app:rippleColor="@color/colorPrimary"
                 app:elevation="5dp"
                 app:borderWidth="0dp"/>
 
