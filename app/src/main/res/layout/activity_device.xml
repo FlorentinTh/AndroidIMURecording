@@ -6,7 +6,7 @@
     android:id="@+id/activity_main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="ca.uqac.liara.imurecording.MainActivity">
+    tools:context="ca.uqac.liara.imurecording.DeviceActivity">
 
     <LinearLayout
         android:layout_above="@+id/btn_layout"

@@ -1,6 +1,12 @@
 <resources>
     <string name="app_name">IMURecording</string>
     <!--Main Activity-->
+    <string name="alert_bluetooth_access_denied_title">Bluetooth was not enabled</string>
+    <string name="alert_bluetooth_access_denied_message">The app may not works as expected</string>
+    <string name="alert_location_permission_title">Location access needed</string>
+    <string name="alert_location_permission_message">The app needs location permission to work properly.</string>
+    <string name="alert_location_permission_denied_title">Location access denied</string>
+    <string name="alert_location_permission_denied_message">The app may not works as expected</string>
     <string name="device_name_unknown">Unknown</string>
     <string name="paired_devices_label">Paired devices</string>
     <string name="available_devices_label">Available devices</string>

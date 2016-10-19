@@ -1,7 +1,17 @@
 package ca.uqac.liara.imurecording;
 
+import android.Manifest;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothManager;
+import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.RequiresApi;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ListView;
@@ -20,7 +30,7 @@ import ca.uqac.liara.imurecording.Utils.StringUtils;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 
-public class MainActivity extends AppCompatActivity {
+public class DeviceActivity extends AppCompatActivity {
 
     private static final int REQUEST_LOCATION_PERMISSION = 101;
     private static final int REQUEST_ENABLE_BLUETOOTH = 201;
@@ -29,6 +39,9 @@ public class MainActivity extends AppCompatActivity {
     private ListView availableDevicesList;
     private ListView pairedDevicesList;
     private FABProgressCircle scanButton;
+
+    private BluetoothManager bluetoothManager;
+    private BluetoothAdapter bluetoothAdapter;
 
     private RxBleClient rxBleClient;
 
@@ -44,12 +57,17 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_device);
 
         rxBleClient = RxBleClient.create(this);
 
         initGUI();
         initListeners();
+        initBluetooth();
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            checkRuntimePermission();
+        }
     }
 
     @Override
@@ -107,6 +125,70 @@ public class MainActivity extends AppCompatActivity {
         );
     }
 
+    private void initBluetooth() {
+        bluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
+        bluetoothAdapter = bluetoothManager.getAdapter();
+
+        if (bluetoothAdapter != null && !bluetoothAdapter.isEnabled()) {
+            Intent enableBTIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            startActivityForResult(enableBTIntent, REQUEST_ENABLE_BLUETOOTH);
+        }
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.M)
+    private void checkRuntimePermission() {
+        if (this.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle(R.string.alert_location_permission_title);
+            builder.setMessage(R.string.alert_location_permission_message);
+            builder.setCancelable(false);
+            builder.setPositiveButton(android.R.string.ok, null);
+            builder.setOnDismissListener(
+                    dialog -> {
+                        requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, REQUEST_LOCATION_PERMISSION);
+                    }
+            );
+            builder.show();
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch (requestCode) {
+            case REQUEST_ENABLE_BLUETOOTH:
+                if (requestCode < 0) {
+                    final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                    builder.setTitle(R.string.alert_bluetooth_access_denied_title);
+                    builder.setMessage(R.string.alert_bluetooth_access_denied_message);
+                    builder.setCancelable(true);
+                    builder.setPositiveButton(android.R.string.ok, null);
+                    builder.setOnDismissListener(dialog -> {});
+                    builder.show();
+                }
+                break;
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        switch (requestCode) {
+            case REQUEST_LOCATION_PERMISSION:
+                if (grantResults[0] != PackageManager.PERMISSION_GRANTED) {
+                    final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                    builder.setTitle(R.string.alert_location_permission_denied_title);
+                    builder.setMessage(R.string.alert_location_permission_denied_message);
+                    builder.setCancelable(true);
+                    builder.setPositiveButton(android.R.string.ok, null);
+                    builder.setOnDismissListener(dialog -> {});
+                    builder.show();
+                }
+                break;
+        }
+    }
+
     private void startBLEScan() {
         scanButton.show();
         scanAvailableDevices = rxBleClient.scanBleDevices()
@@ -140,7 +222,7 @@ public class MainActivity extends AppCompatActivity {
 
         unsubscribeBLEDevice();
 
-        connectAvailableDevice = device.establishConnection(MainActivity.this, false)
+        connectAvailableDevice = device.establishConnection(DeviceActivity.this, false)
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnUnsubscribe(() -> {
                     String connectionStateValue = StringUtils.getConnectionStateDescription(device.getConnectionState().toString());
@@ -165,6 +247,7 @@ public class MainActivity extends AppCompatActivity {
         if (connectAvailableDevice != null && availableDeviceAdapter != null) {
             Snackbar.make(layout, R.string.unpair_confirm_text, Snackbar.LENGTH_LONG).show();
             connectAvailableDevice.unsubscribe();
+            connectAvailableDevice = null;
             pairedDevices.clear();
             availableDeviceAdapter.notifyDataSetChanged();
             pairedDeviceAdapter.notifyDataSetChanged();
