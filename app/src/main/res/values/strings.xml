@@ -4,5 +4,8 @@
     <string name="device_name_unknown">Unknown</string>
     <string name="paired_devices_label">Paired devices</string>
     <string name="available_devices_label">Available devices</string>
+    <string name="use_button_label">Use</string>
+    <string name="unpair_ask_text">Do you want to unpair this device?</string>
     <string name="unpair_button_label">Unpair</string>
+    <string name="unpair_confirm_text">The device has been unpaired</string>
 </resources>

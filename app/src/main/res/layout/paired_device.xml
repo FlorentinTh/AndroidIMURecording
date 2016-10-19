@@ -1,13 +1,48 @@
-<?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<?xml version="1.0" encoding="utf-8" ?>
+<com.daimajia.swipe.SwipeLayout
+    xmlns:swipe="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/swipe_layout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin">
+    android:layout_height="wrap_content"
+    swipe:leftEdgeSwipeOffset="0dp"
+    swipe:rightEdgeSwipeOffset="0dp">
+
+    <LinearLayout
+        android:id="@+id/bottom_wrapper"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:gravity="center"
+        android:background="@color/colorDelete">
+
+        <ImageView
+            android:id="@+id/trash"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_weight="10"
+            android:src="@drawable/ic_trash" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="80"
+            android:text="@string/unpair_ask_text"
+            android:textColor="@color/colorPrimaryIconsText"
+            android:textSize="12sp" />
+
+        <Button
+            android:id="@+id/btn_unpair"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="10"
+            android:textColor="@color/colorPrimaryIconsText"
+            android:text="@string/unpair_button_label"
+            style="?android:attr/borderlessButtonStyle" />
+
+    </LinearLayout>
 
     <RelativeLayout
+        android:padding="16dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
 
@@ -17,20 +52,20 @@
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:textColor="@color/colorSecondaryText"
-            android:textSize="16dp"
+            android:textSize="16sp"
             android:textAllCaps="true" />
 
 
         <Button
-            android:id="@+id/btn_unpair"
+            android:id="@+id/btn_use"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
             android:textColor="@color/colorPrimary"
-            android:text="@string/unpair_button_label"
+            android:text="@string/use_button_label"
             style="?android:attr/borderlessButtonStyle" />
 
     </RelativeLayout>
 
-</RelativeLayout>
+</com.daimajia.swipe.SwipeLayout>
