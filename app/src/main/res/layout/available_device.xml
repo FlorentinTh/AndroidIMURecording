@@ -15,7 +15,7 @@
             android:layout_height="wrap_content"
             android:paddingBottom="3dp"
             android:textColor="@color/colorSecondaryText"
-            android:textSize="16dp"
+            android:textSize="16sp"
             android:textAllCaps="true" />
 
         <TextView
@@ -23,7 +23,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/name"
-            android:textSize="10dp"
+            android:textSize="10sp"
             android:textAllCaps="true" />
 
         <TextView
@@ -31,7 +31,9 @@
             android:layout_height="wrap_content"
             android:id="@+id/connection_state"
             android:layout_centerVertical="true"
-            android:layout_alignParentRight="true" />
+            android:textSize="14sp"
+            android:textAllCaps="true"
+            android:layout_alignParentEnd="true" />
 
     </RelativeLayout>
 

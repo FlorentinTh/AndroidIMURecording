@@ -1,23 +1,34 @@
 <resources>
-    <!--Config-->
+    <!--SharedPreferences-->
     <string name="shared_preference_file">PairedBLEDevice</string>
     <string name="device_name_key_value">deviceName</string>
     <string name="device_mac_address_key_value">macAdress</string>
+    <!--UUIDs-->
+    <string name="hiking_name_uuid">0x0D01</string>
+    <string name="start_record_uuid">0x0D02</string>
+    <string name="sensor_location_uuid">0x0D03</string>
+    <string name="username_uuid">0x0D04</string>
     <!--App-->
     <string name="app_name">IMURecording</string>
     <!--Main Activity-->
     <string name="alert_bluetooth_access_denied_title">Bluetooth was not enabled</string>
     <string name="alert_bluetooth_access_denied_message">The app may not works as expected</string>
-    <string name="alert_location_permission_title">Location access needed</string>
-    <string name="alert_location_permission_message">The app needs location permission to work properly.</string>
     <string name="alert_location_permission_denied_title">Location access denied</string>
     <string name="alert_location_permission_denied_message">The app may not works as expected</string>
     <string name="device_name_unknown">Unknown</string>
-    <string name="paired_devices_label">Paired devices</string>
+    <string name="device_already_paired">Cannot pair more than one device</string>
+    <string name="default_connection_state_value">Not Paired</string>
+    <string name="paired_devices_label">Paired device</string>
     <string name="available_devices_label">Available devices</string>
     <string name="use_button_label">Use</string>
     <string name="unpair_ask_text">Do you want to unpair this device?</string>
     <string name="unpair_button_label">Unpair</string>
     <string name="unpair_confirm_text">The device has been unpaired</string>
     <!--Communication Activity-->
+    <string name="hiking_name_hint">Hiking name</string>
+    <string name="sensor_location_hint">Sensor location</string>
+    <string name="username_hint">Username</string>
+    <string name="hiking_name_input_empty">Hiking name cannot be empty</string>
+    <string name="sensor_location_input_empty">Sensor location cannot be empty</string>
+    <string name="username_input_empty">Username cannot be empty</string>
 </resources>

@@ -1,5 +1,6 @@
 package ca.uqac.liara.imurecording.Adapters;
 
+import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
@@ -13,7 +14,6 @@ import com.daimajia.androidanimations.library.YoYo;
 import com.daimajia.swipe.SimpleSwipeListener;
 import com.daimajia.swipe.SwipeLayout;
 import com.daimajia.swipe.adapters.BaseSwipeAdapter;
-import com.polidea.rxandroidble.RxBleDevice;
 
 import java.util.List;
 
@@ -26,7 +26,7 @@ import ca.uqac.liara.imurecording.R;
 public class PairedDeviceAdapter extends BaseSwipeAdapter {
 
     private Context context;
-    private List<RxBleDevice> data;
+    private List<BluetoothDevice> data;
     private OnUseButtonClickListener useListener;
     private OnUnpairButtonClickListener unpairListener;
 
@@ -38,9 +38,21 @@ public class PairedDeviceAdapter extends BaseSwipeAdapter {
         this.unpairListener = listener;
     }
 
-    public PairedDeviceAdapter(Context context, List<RxBleDevice> data) {
+    public PairedDeviceAdapter(Context context, List<BluetoothDevice> data) {
         this.context = context;
         this.data = data;
+    }
+
+    public void addDevice(BluetoothDevice device) {
+        data.add(device);
+    }
+
+    public BluetoothDevice getDevice(int position) {
+        return data.get(position);
+    }
+
+    public void clear() {
+        data.clear();
     }
 
     @Override
@@ -72,7 +84,7 @@ public class PairedDeviceAdapter extends BaseSwipeAdapter {
         holder.unpairButton = (Button) view.findViewById(R.id.btn_unpair);
         view.setTag(holder);
 
-        RxBleDevice device = getItem(position);
+        BluetoothDevice device = getDevice(position);
 
         String deviceName = device.getName();
 
@@ -105,19 +117,13 @@ public class PairedDeviceAdapter extends BaseSwipeAdapter {
     public void fillValues(int position, View convertView) {}
 
     @Override
-    public int getCount() {
-        return data.size();
-    }
+    public int getCount() { return data.size(); }
 
     @Override
-    public RxBleDevice getItem(int position) {
-        return data.get(position);
-    }
+    public Object getItem(int position) { return data.get(position); }
     
     @Override
-    public long getItemId(int position) {
-        return data.indexOf(data.get(position));
-    }
+    public long getItemId(int position) { return data.indexOf(data.get(position)); }
 
     public class ViewHolder {
         public TextView name;

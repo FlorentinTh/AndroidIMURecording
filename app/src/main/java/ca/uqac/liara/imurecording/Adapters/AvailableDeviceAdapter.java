@@ -1,19 +1,18 @@
 package ca.uqac.liara.imurecording.Adapters;
 
 import android.app.Activity;
+import android.bluetooth.BluetoothDevice;
 import android.content.Context;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
-import com.polidea.rxandroidble.RxBleDevice;
-
 import java.util.List;
 
 import ca.uqac.liara.imurecording.R;
-import ca.uqac.liara.imurecording.Utils.StringUtils;
 
 /**
  * Created by FlorentinTh on 10/14/2016.
@@ -22,11 +21,42 @@ import ca.uqac.liara.imurecording.Utils.StringUtils;
 public class AvailableDeviceAdapter extends BaseAdapter {
 
     private Context context;
-    private List<RxBleDevice> data;
+    private List<BluetoothDevice> data;
+    private BluetoothDevice pairedDevice;
 
-    public AvailableDeviceAdapter(Context context, List<RxBleDevice> data) {
+    public AvailableDeviceAdapter(Context context, List<BluetoothDevice> data) {
         this.context = context;
         this.data = data;
+    }
+
+    public void addDevice(BluetoothDevice device) {
+        if (!(data.contains(device))) {
+            if (pairedDevice != null) {
+                if (!device.equals(pairedDevice)) {
+                    data.add(device);
+                }
+            } else {
+                data.add(device);
+            }
+        }
+    }
+
+    public void removeDevice(BluetoothDevice device) {
+        if (data.contains(device)) {
+            data.remove(device);
+        }
+    }
+
+    public void setPairedDevice(BluetoothDevice device) {
+        pairedDevice = device;
+    }
+
+    public BluetoothDevice getDevice(int position) {
+        return data.get(position);
+    }
+
+    public void clear() {
+        data.clear();
     }
 
     @Override
@@ -35,7 +65,7 @@ public class AvailableDeviceAdapter extends BaseAdapter {
     }
 
     @Override
-    public RxBleDevice getItem(int position) {
+    public Object getItem(int position) {
         return data.get(position);
     }
 
@@ -60,19 +90,18 @@ public class AvailableDeviceAdapter extends BaseAdapter {
             holder = (ViewHolder) convertView.getTag();
         }
 
-        RxBleDevice device = getItem(position);
+        BluetoothDevice device = getDevice(position);
 
         String deviceName = device.getName();
 
-        if (deviceName == null) {
+        if (device.getName() == null) {
             deviceName = context.getString(R.string.device_name_unknown);
         }
 
         holder.name.setText(deviceName);
-        holder.address.setText("[" + device.getMacAddress() + "]");
-
-        String connectionStateValue = StringUtils.getConnectionStateDescription(device.getConnectionState().toString());
-        StringUtils.setConnectionStateValue(holder.connectionState, connectionStateValue);
+        holder.address.setText("[" + device.getAddress() + "]");
+        holder.connectionState.setText(R.string.default_connection_state_value);
+        holder.connectionState.setTextColor(Color.RED);
 
         return convertView;
     }
