@@ -9,4 +9,5 @@
     <color name="colorDivider">#BDBDBD</color>
     <color name="colorAccent">#448AFF</color>
     <color name="colorDelete">#F44336</color>
+    <color name="colorSuccess">#4CAF50</color>
 </resources>

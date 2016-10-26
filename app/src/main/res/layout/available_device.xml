@@ -33,7 +33,18 @@
             android:layout_centerVertical="true"
             android:textSize="14sp"
             android:textAllCaps="true"
+            android:text="TEST"
             android:layout_alignParentEnd="true" />
+
+        <ProgressBar
+            style="?android:attr/progressBarStyleLarge"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:id="@+id/progress"
+            android:visibility="invisible"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            />
 
     </RelativeLayout>
 

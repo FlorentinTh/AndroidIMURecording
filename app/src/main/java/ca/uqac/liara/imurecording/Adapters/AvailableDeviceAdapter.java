@@ -3,11 +3,11 @@ package ca.uqac.liara.imurecording.Adapters;
 import android.app.Activity;
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
-import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import java.util.List;
@@ -85,6 +85,7 @@ public class AvailableDeviceAdapter extends BaseAdapter {
             holder.name = (TextView) convertView.findViewById(R.id.name);
             holder.address = (TextView) convertView.findViewById(R.id.address);
             holder.connectionState = (TextView) convertView.findViewById(R.id.connection_state);
+            holder.progress = (ProgressBar) convertView.findViewById(R.id.progress);
             convertView.setTag(holder);
         } else {
             holder = (ViewHolder) convertView.getTag();
@@ -101,7 +102,8 @@ public class AvailableDeviceAdapter extends BaseAdapter {
         holder.name.setText(deviceName);
         holder.address.setText("[" + device.getAddress() + "]");
         holder.connectionState.setText(R.string.default_connection_state_value);
-        holder.connectionState.setTextColor(Color.RED);
+        holder.connectionState.setTextColor(context.getResources().getColor(R.color.colorDelete));
+        holder.progress.setVisibility(View.GONE);
 
         return convertView;
     }
@@ -110,5 +112,6 @@ public class AvailableDeviceAdapter extends BaseAdapter {
         public TextView name;
         public TextView address;
         public TextView connectionState;
+        public ProgressBar progress;
     }
 }
