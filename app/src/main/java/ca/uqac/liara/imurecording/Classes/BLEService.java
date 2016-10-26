@@ -1,4 +1,4 @@
-package Classes;
+package ca.uqac.liara.imurecording.Classes;
 
 import java.util.UUID;
 

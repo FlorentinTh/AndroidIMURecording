@@ -40,7 +40,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
-import Classes.BLEService;
+import ca.uqac.liara.imurecording.Classes.BLEService;
 import ca.uqac.liara.imurecording.Adapters.AvailableDeviceAdapter;
 import ca.uqac.liara.imurecording.Adapters.PairedDeviceAdapter;
 import ca.uqac.liara.imurecording.R;
