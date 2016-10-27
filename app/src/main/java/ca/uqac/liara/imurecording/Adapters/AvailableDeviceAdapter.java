@@ -103,7 +103,7 @@ public class AvailableDeviceAdapter extends BaseAdapter {
         holder.address.setText("[" + device.getAddress() + "]");
         holder.connectionState.setText(R.string.default_connection_state_value);
         holder.connectionState.setTextColor(context.getResources().getColor(R.color.colorDelete));
-        holder.progress.setVisibility(View.GONE);
+        holder.progress.setVisibility(View.INVISIBLE);
 
         return convertView;
     }

@@ -70,8 +70,6 @@ public class PairedDeviceAdapter extends BaseSwipeAdapter {
         swipeLayout.addDrag(SwipeLayout.DragEdge.Left, view.findViewById(R.id.bottom_wrapper));
 
         swipeLayout.addSwipeListener(new SimpleSwipeListener() {
-
-
             @Override
             public void onOpen(SwipeLayout layout) {
                 YoYo.with(Techniques.Tada).duration(500).delay(100).playOn(layout.findViewById(R.id.trash));

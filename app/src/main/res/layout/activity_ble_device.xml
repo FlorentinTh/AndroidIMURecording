@@ -6,8 +6,8 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_below="@id/toolbar"
-    tools:context="ca.uqac.liara.imurecording.Activities.MainActivity">
+    android:id="@+id/activity_ble_devices"
+    tools:context="ca.uqac.liara.imurecording.Activities.BLEDeviceActivity">
 
     <LinearLayout
         android:layout_above="@+id/btn_layout"

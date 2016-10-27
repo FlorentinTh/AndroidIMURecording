@@ -1,5 +1,8 @@
 package ca.uqac.liara.imurecording.Utils;
 
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+
 /**
  * Created by FlorentinTh on 10/25/2016.
  */
@@ -23,18 +26,18 @@ public abstract class ByteArrayUtils {
     }
 
     public static byte[] integerToByteArray(int i) {
-        return new byte[] {
-                (byte) (i >>> 24),
-                (byte) (i >>> 16),
-                (byte) (i >>> 8),
-                (byte) i
-        };
+        return ByteBuffer.allocate(4).putInt(i).array();
     }
 
     public static int byteArrayToInteger(byte[] bytes) {
-        return  (bytes[0] << 24) +
-                ((bytes[1] & 0xFF) << 16) +
-                ((bytes[2] & 0xFF) << 8) +
-                (bytes[3] & 0xFF);
+        return ByteBuffer.wrap(bytes).getInt();
+    }
+
+    public static byte[] floatToByteArray(float v) {
+        return ByteBuffer.allocate(4).order(ByteOrder.BIG_ENDIAN).putFloat(v).array();
+    }
+
+    public static float byteArrayToFloat(byte[] bytes) {
+        return ByteBuffer.wrap(bytes).getFloat();
     }
 }

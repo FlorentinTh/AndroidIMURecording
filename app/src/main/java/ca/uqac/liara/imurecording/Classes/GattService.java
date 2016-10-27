@@ -6,12 +6,12 @@ import java.util.UUID;
  * Created by FlorentinTh on 10/24/2016.
  */
 
-public class BLEService {
+public class GattService {
     private UUID uuid;
 
-    public BLEService() {}
+    public GattService() {}
 
-    public BLEService(UUID uuid) {
+    public GattService(UUID uuid) {
         this.uuid = uuid;
     }
 

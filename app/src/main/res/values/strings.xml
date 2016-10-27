@@ -1,9 +1,4 @@
 <resources>
-    <!--Services UUIDs-->
-    <string name="gps_service">0000b00-0000-1000-8000-00805f9b34fb</string>
-    <string name="weather_service">0000c00-0000-1000-8000-00805f9b34fb</string>
-    <string name="metadata_service">0000d00-0000-1000-8000-00805f9b34fb</string>
-    <string name="imu_service">0000e00-0000-1000-8000-00805f9b34fb</string>
     <!--Characteristics UUIDs-->
     <string name="hiking_name_uuid">0000d01-0000-1000-8000-00805f9b34fb</string>
     <string name="start_record_uuid">0000d02-0000-1000-8000-00805f9b34fb</string>
@@ -23,14 +18,12 @@
     <string name="use_button_label">Use</string>
     <string name="unpair_ask_text">Do you want to unpair this device?</string>
     <string name="unpair_button_label">Unpair</string>
-    <string name="device_unreachable">Selected device is unreachable.</string>
-    <string name="device_connection_failed">Pairing to device failed.</string>
     <string name="action_retry">Retry</string>
     <string name="unpair_confirm_text">The device has been unpaired.</string>
     <string name="hiking_name_hint">Hiking name</string>
     <string name="sensor_location_hint">Sensor location</string>
     <string name="username_hint">Username</string>
-    <string name="hiking_name_input_invalid">Hiking name cannot be empty  and smaller than 20</string>
-    <string name="sensor_location_input_invalid">Sensor location cannot be empty  and smaller than 20</string>
-    <string name="username_input_invalid">Username cannot be empty and smaller than 20</string>
+    <string name="hiking_name_input_invalid">Hiking name cannot be empty  and greater than 20.</string>
+    <string name="sensor_location_input_invalid">Sensor location cannot be empty  and greater than 20.</string>
+    <string name="username_input_invalid">Username cannot be empty and greater than 20.</string>
 </resources>
