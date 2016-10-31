@@ -31,11 +31,13 @@ import com.github.jorgecastilloprz.FABProgressCircle;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import ca.uqac.liara.imurecording.Adapters.AvailableDeviceAdapter;
 import ca.uqac.liara.imurecording.Adapters.PairedDeviceAdapter;
 import ca.uqac.liara.imurecording.R;
 import ca.uqac.liara.imurecording.Services.BluetoothLEService;
+import ca.uqac.liara.imurecording.Utils.ByteArrayUtils;
 
 public class BLEDeviceActivity extends AppCompatActivity {
 
@@ -53,36 +55,62 @@ public class BLEDeviceActivity extends AppCompatActivity {
     private BluetoothAdapter bluetoothAdapter;
     private BluetoothDevice device;
     private BluetoothLEService bluetoothLEService;
+    private final ServiceConnection serviceConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            bluetoothLEService = ((BluetoothLEService.LocalBinder) service).getService();
+        }
 
-//    private RxBleClient rxBleClient;
-//    private RxBleDevice rxDevice;
-//    private Subscription connectionSubscription;
-//    private Observable<RxBleConnection> connectionObservable;
-//    private PublishSubject<Void> disconnectTriggerSubject = PublishSubject.create();
-//    private Observable<List<GattService>> serviceObservable;
-
-
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            bluetoothLEService = null;
+        }
+    };
     private AvailableDeviceAdapter availableDeviceAdapter;
+    private final BluetoothAdapter.LeScanCallback leScanCallback = (device, rssi, scanRecord) -> {
+        runOnUiThread(
+                () -> {
+                    availableDeviceAdapter.addDevice(device);
+                    availableDeviceAdapter.notifyDataSetChanged();
+                }
+        );
+    };
     private PairedDeviceAdapter pairedDeviceAdapter;
     private List<BluetoothDevice> pairedDevice;
     private List<BluetoothDevice> availableDevices;
-
     private Handler handler;
     private boolean isScanning;
+    private boolean isRecording = false;
+    private final BroadcastReceiver gattUpdateReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            final String action = intent.getAction();
 
-//    private HashMap<UUID, byte[]> characteristics = new HashMap<>();
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-        initBluetooth();
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            checkRuntimePermission();
+            if (BluetoothLEService.ACTION_GATT_CONNECTED.equals(action)) {
+                updateViewOnPair(false, true);
+            } else if (BluetoothLEService.ACTION_GATT_DISCONNECTED.equals(action)) {
+                updateViewOnPair(false, false);
+                final Snackbar snackbar = Snackbar.make(layout,
+                        getResources().getString(R.string.unpair_confirm_text),
+                        Snackbar.LENGTH_LONG);
+                snackbar.show();
+            } else if (BluetoothLEService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
+//                subscribeGattCharacteristics(bluetoothLEService.getSupportedGattServices());
+                readCharacteristic(UUID.fromString(getResources().getString(R.string.metadata_service)),
+                        UUID.fromString(getResources().getString(R.string.start_record_uuid)));
+            } else if (BluetoothLEService.ACTION_DATA_AVAILABLE.equals(action)) {
+                setIsRecording(intent.getStringExtra(BluetoothLEService.EXTRA_UUID), intent.getByteArrayExtra(BluetoothLEService.EXTRA_DATA));
+            }
         }
+    };
 
-        registerReceiver(gattUpdateReceiver, makeGattUpdateIntentFilter());
+    private static IntentFilter makeGattUpdateIntentFilter() {
+        final IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(BluetoothLEService.ACTION_GATT_CONNECTED);
+        intentFilter.addAction(BluetoothLEService.ACTION_GATT_DISCONNECTED);
+        intentFilter.addAction(BluetoothLEService.ACTION_GATT_SERVICES_DISCOVERED);
+        intentFilter.addAction(BluetoothLEService.ACTION_DATA_AVAILABLE);
+        return intentFilter;
     }
 
     @Override
@@ -94,22 +122,38 @@ public class BLEDeviceActivity extends AppCompatActivity {
 
         initGUI();
         initListeners();
-//        initServices();
-
-        Intent gattServiceIntent = new Intent(this, BluetoothLEService.class);
-        bindService(gattServiceIntent, serviceConnection, BIND_AUTO_CREATE);
     }
 
     @Override
-    protected void onPause() {
-        super.onPause();
-        unregisterReceiver(gattUpdateReceiver);
+    protected void onStart() {
+        super.onStart();
+
+        Intent gattServiceIntent = new Intent(this, BluetoothLEService.class);
+        bindService(gattServiceIntent, serviceConnection, BIND_AUTO_CREATE);
+        registerReceiver(gattUpdateReceiver, makeGattUpdateIntentFilter());
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        initBluetooth();
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            checkRuntimePermission();
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-//        disconnect();
+
+        unregisterReceiver(gattUpdateReceiver);
         unbindService(serviceConnection);
         bluetoothLEService = null;
     }
@@ -149,7 +193,6 @@ public class BLEDeviceActivity extends AppCompatActivity {
         availableDevicesList.setOnItemClickListener(
                 (parent, view, position, id) -> {
                     device = availableDeviceAdapter.getDevice(position);
-//                    pair(true, device, view);
 
                     if (pairedDeviceAdapter.getCount() > 0) {
                         final Snackbar snackbar = Snackbar.make(layout,
@@ -168,15 +211,12 @@ public class BLEDeviceActivity extends AppCompatActivity {
         pairedDeviceAdapter.setOnUseButtonClickListener(
                 position -> {
                     device = pairedDeviceAdapter.getDevice(position);
-                    sendDataActivity(device);
-//                    subscribeCharacteristics();
-//                    readCharacteristic(UUID.fromString(getResources().getString(R.string.start_record_uuid)));
+                    sendDataToActivity(device, isRecording);
                 }
         );
 
         pairedDeviceAdapter.setOnUnpairButtonClickListener(
                 position -> {
-//                    pair(false, device, null);
                     updateViewOnPair(false, false);
                     bluetoothLEService.disconnect();
                 }
@@ -191,8 +231,6 @@ public class BLEDeviceActivity extends AppCompatActivity {
             Intent enableBTIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivityForResult(enableBTIntent, REQUEST_ENABLE_BLUETOOTH);
         }
-
-//        rxBleClient = RxBleClient.create(this);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
@@ -208,8 +246,8 @@ public class BLEDeviceActivity extends AppCompatActivity {
         switch (requestCode) {
             case REQUEST_ENABLE_BLUETOOTH:
                 if (requestCode == Activity.RESULT_CANCELED) {
-                    showAlertDialog(getResources().getString(R.string.alert_bluetooth_access_denied_title),
-                            getResources().getString(R.string.alert_work_message));
+                    showAlertDialog(getResources().getString(R.string.popup_titles),
+                            getResources().getString(R.string.alert_bluetooth_message));
                 }
                 break;
         }
@@ -222,8 +260,8 @@ public class BLEDeviceActivity extends AppCompatActivity {
         switch (requestCode) {
             case REQUEST_LOCATION_PERMISSION:
                 if (grantResults[0] != PackageManager.PERMISSION_GRANTED) {
-                    showAlertDialog(getResources().getString(R.string.alert_location_permission_denied_title),
-                            getResources().getString(R.string.alert_work_message));
+                    showAlertDialog(getResources().getString(R.string.popup_titles),
+                            getResources().getString(R.string.alert_location_permission_denied_message));
                 }
                 break;
         }
@@ -235,7 +273,8 @@ public class BLEDeviceActivity extends AppCompatActivity {
         builder.setMessage(message);
         builder.setCancelable(true);
         builder.setPositiveButton(android.R.string.ok, null);
-        builder.setOnDismissListener(dialog -> {});
+        builder.setOnDismissListener(dialog -> {
+        });
         builder.show();
     }
 
@@ -262,45 +301,22 @@ public class BLEDeviceActivity extends AppCompatActivity {
         }
     }
 
-    private final BluetoothAdapter.LeScanCallback leScanCallback = (device, rssi, scanRecord) -> {
-        runOnUiThread(
-                () -> {
-                    availableDeviceAdapter.addDevice(device);
-                    availableDeviceAdapter.notifyDataSetChanged();
-                }
-        );
-    };
-
-    private final ServiceConnection serviceConnection = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder service) {
-            bluetoothLEService = ((BluetoothLEService.LocalBinder) service).getService();
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName name) {
-            bluetoothLEService = null;
-        }
-    };
-
-    private final BroadcastReceiver gattUpdateReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            final String action = intent.getAction();
-
-            if (BluetoothLEService.ACTION_GATT_CONNECTED.equals(action)) {
-                updateViewOnPair(false, true);
-            } else if (BluetoothLEService.ACTION_GATT_DISCONNECTED.equals(action)) {
-                updateViewOnPair(false, false);
-                final Snackbar snackbar = Snackbar.make(layout,
-                        getResources().getString(R.string.unpair_confirm_text),
-                        Snackbar.LENGTH_LONG);
-                snackbar.show();
-            } else if (BluetoothLEService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
-                subscribeGattCharacteristics(bluetoothLEService.getSupportedGattServices());
-            }
-        }
-    };
+//    private void subscribeGattCharacteristics(List<BluetoothGattService> gattServices) {
+//        final List<BluetoothGattCharacteristic> gattCharacteristics = new ArrayList<>();
+//
+//        if (gattServices.size() > 0) {
+//            for (BluetoothGattService gattService : gattServices.subList(2, gattServices.size())) {
+//                List<BluetoothGattCharacteristic> gattServiceCharacteristics = gattService.getCharacteristics();
+//                gattCharacteristics.addAll(gattServiceCharacteristics);
+//            }
+//        }
+//
+//        if (gattCharacteristics.size() > 0) {
+//            for (BluetoothGattCharacteristic gattCharacteristic : gattCharacteristics) {
+//                bluetoothLEService.setCharacteristicNotification(gattCharacteristic, true);
+//            }
+//        }
+//    }
 
     private void updateViewOnPair(final Boolean init, final Boolean enable) {
 
@@ -332,294 +348,52 @@ public class BLEDeviceActivity extends AppCompatActivity {
         );
     }
 
-    private void subscribeGattCharacteristics(List<BluetoothGattService> gattServices) {
-        final List<BluetoothGattCharacteristic> gattCharacteristics = new ArrayList<>();
+    private void readCharacteristic(UUID uuidService, UUID uuidCharacteristic) {
+        final List<BluetoothGattService> services = bluetoothLEService.getSupportedGattServices();
 
-        if (gattServices.size() > 0) {
-            for (BluetoothGattService gattService : gattServices.subList(2, gattServices.size())) {
-                List<BluetoothGattCharacteristic> gattServiceCharacteristics = gattService.getCharacteristics();
-                gattCharacteristics.addAll(gattServiceCharacteristics);
+        BluetoothGattService service = null;
+        BluetoothGattCharacteristic characteristic = null;
+
+        for (BluetoothGattService s : services) {
+            if (s.getUuid().equals(uuidService)) {
+                service = s;
             }
         }
 
-        if (gattCharacteristics.size() > 0) {
-            for (BluetoothGattCharacteristic gattCharacteristic : gattCharacteristics) {
-                bluetoothLEService.setCharacteristicNotification(gattCharacteristic, true);
+        if (service != null) {
+            characteristic = service.getCharacteristic(uuidCharacteristic);
+        }
+
+        if (characteristic != null) {
+            int properties = characteristic.getProperties();
+            if (((properties & BluetoothGattCharacteristic.PROPERTY_READ) ==
+                    BluetoothGattCharacteristic.PROPERTY_READ)) {
+                bluetoothLEService.readCharacteristic(characteristic);
             }
         }
     }
 
-    private void sendDataActivity(BluetoothDevice device) {
+    private void setIsRecording(String uuid, byte[] data) {
+        if (uuid.equals(getResources().getString(R.string.start_record_uuid))) {
+            final boolean started = ByteArrayUtils.byteArrayToBoolean(data);
+
+            isRecording = started;
+
+            bluetoothLEService.setCharacteristicNotification(
+                    bluetoothLEService.getCharacteristicFromService(
+                            getResources().getString(R.string.metadata_service),
+                            getResources().getString(R.string.start_record_uuid)), true);
+        }
+    }
+
+    private void sendDataToActivity(BluetoothDevice device, boolean b) {
         Intent intent = new Intent(this, SendDataActivity.class);
-        intent.putExtra("device", device);
+        Bundle bundle = new Bundle();
+
+        bundle.putParcelable("device", device);
+        bundle.putBoolean("isRecording", b);
+
+        intent.putExtras(bundle);
         startActivity(intent);
     }
-
-    private static IntentFilter makeGattUpdateIntentFilter() {
-        final IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(BluetoothLEService.ACTION_GATT_CONNECTED);
-        intentFilter.addAction(BluetoothLEService.ACTION_GATT_DISCONNECTED);
-        intentFilter.addAction(BluetoothLEService.ACTION_GATT_SERVICES_DISCOVERED);
-        intentFilter.addAction(BluetoothLEService.ACTION_DATA_AVAILABLE);
-        return intentFilter;
-    }
-
-//    private void pair(final boolean enable, BluetoothDevice device, View view) {
-//        if (enable) {
-//            AvailableDeviceAdapter.ViewHolder holder = (AvailableDeviceAdapter.ViewHolder) view.getTag();
-//
-//            if (pairedDeviceAdapter.getCount() > 0) {
-//                final Snackbar snackbar = Snackbar.make(mainLayout, getResources().getString(R.string.device_already_paired), Snackbar.LENGTH_LONG);
-//                snackbar.show();
-//                return;
-//            }
-//
-//            try {
-//                rxDevice = rxBleClient.getBleDevice(device.getAddress());
-//            } catch (Exception e) {
-//                final Snackbar snackbar = Snackbar.make(mainLayout, getResources().getString(R.string.device_unreachable), Snackbar.LENGTH_LONG);
-//                snackbar.setAction(getResources().getString(R.string.action_retry), v -> pair(true, device, view));
-//
-//                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-//                    snackbar.setActionTextColor(getResources().getColor(R.color.colorDelete, null));
-//                } else {
-//                    snackbar.setActionTextColor(getResources().getColor(R.color.colorDelete));
-//                }
-//
-//                snackbar.show();
-//            }
-//
-//            holder.connectionState.setVisibility(View.INVISIBLE);
-//            holder.progress.setVisibility(View.VISIBLE);
-//
-//            connectionObservable = rxDevice
-//                    .establishConnection(this, false)
-//                    .takeUntil(disconnectTriggerSubject)
-//                    .doOnUnsubscribe(() -> connectionObservable = null)
-//                    .observeOn(AndroidSchedulers.mainThread())
-//                    .compose(new ConnectionSharingAdapter());
-//
-//            connectionSubscription = connectionObservable
-//                    .subscribe(
-//                            rxBleConnection -> {
-//                                holder.connectionState.setVisibility(View.VISIBLE);
-//                                holder.progress.setVisibility(View.GONE);
-//
-//                                pairedDeviceAdapter.addDevice(device);
-//                                availableDeviceAdapter.removeDevice(device);
-//                                availableDeviceAdapter.setPairedDevice(device);
-//                                pairedDeviceAdapter.notifyDataSetChanged();
-//                                availableDeviceAdapter.notifyDataSetChanged();
-//
-//                                initServices();
-//
-//
-//                            }, throwable -> {
-//                                holder.connectionState.setVisibility(View.VISIBLE);
-//                                holder.progress.setVisibility(View.GONE);
-//
-//                                final Snackbar snackbar = Snackbar.make(mainLayout, getResources().getString(R.string.device_connection_failed), Snackbar.LENGTH_LONG);
-//                                snackbar.setAction(getResources().getString(R.string.action_retry), v -> pair(true, device, view));
-//                                snackbar.setActionTextColor(getResources().getColor(R.color.colorDelete));
-//                                snackbar.show();
-//                            }
-//                    );
-//        } else {
-//            disconnect();
-//
-//            pairedDeviceAdapter.clear();
-//            pairedDeviceAdapter.notifyDataSetChanged();
-//            availableDeviceAdapter.setPairedDevice(null);
-//
-//            final Snackbar snackbar = Snackbar.make(mainLayout, getResources().getString(R.string.unpair_confirm_text), Snackbar.LENGTH_LONG);
-//            snackbar.show();
-//        }
-//    }
-
-//    private boolean isConnected() {
-//        return rxDevice.getConnectionState() == RxBleConnection.RxBleConnectionState.CONNECTED;
-//    }
-
-//    private void disconnect() {
-//        if (connectionSubscription != null &&
-//                !connectionSubscription.isUnsubscribed()) {
-//            connectionObservable = null;
-//            connectionSubscription.unsubscribe();
-//        }
-//    }
-
-//    private void initServices() {
-//        serviceObservable = Observable.create(
-//                subscriber -> {
-//                    try {
-//                        List<GattService> services = new ArrayList<>();
-//                        services.add(new GattService(UUID.fromString(getResources().getString(R.string.gps_service))));
-//                        services.add(new GattService(UUID.fromString(getResources().getString(R.string.weather_service))));
-//                        services.add(new GattService(UUID.fromString(getResources().getString(R.string.metadata_service))));
-//                        services.add(new GattService(UUID.fromString(getResources().getString(R.string.imu_service))));
-//
-//                        subscriber.onNext(services);
-//                        subscriber.onCompleted();
-//
-//                    } catch (Exception e) {
-//                        Log.e(getClass().getSimpleName(), "Error occurs : " + e.getMessage());
-//                    }
-//                }
-//        );
-//    }
-
-//    private void  subscribeCharacteristics() {
-//        if (isConnected()) {
-//            connectionObservable.flatMap(
-//                    rxBleConnection ->
-//                            rxBleConnection.discoverServices()
-//                                    .flatMap(rxBleDeviceServices ->
-//                                            serviceObservable
-//                                                    .flatMapIterable(services -> services)
-//                                                    .flatMap(service ->
-//                                                            rxBleDeviceServices.getService(service.getUuid())
-//                                                                    .map(BluetoothGattService::getCharacteristics)))
-//                                    .flatMap(Observable::from)
-//                                    .flatMap(characteristic ->
-//                                            rxBleConnection.setupNotification(characteristic).flatMap(
-//                                                    observable ->
-//                                                            observable
-//                                            ),
-//                                            Pair::new
-//                                    )
-//            ).subscribe(
-//                    observablePair -> {
-//                        characteristics.put(
-//                                observablePair.first.getUuid(),
-//                                observablePair.second
-//                        );
-//                    }, throwable -> {
-//                        Log.e(getClass().getSimpleName(), "Error occurs : " + throwable.toString());
-//
-//                    }
-//            );
-//        }
-//    }
-
-//    private void readCharacteristic(UUID uuid) {
-//        if (isConnected()){
-//            connectionObservable.flatMap(
-//                    rxBleConnection ->
-//                            rxBleConnection.readCharacteristic(uuid)
-//            ).subscribe(
-//                    bytes -> {
-//                        characteristics.put(uuid, bytes);
-//                        runOnUiThread(() -> toggleActionButton(ByteArrayUtils.byteArrayToBoolean(bytes)));
-//                    },
-//                    throwable -> {
-//                        Log.e(getClass().getSimpleName(), "Error occurs : " + throwable.toString());
-//                    }
-//            );
-//        }
-//    }
-
-//    private void toggleActionButton(final boolean b) {
-//        final boolean isVisible = sendButton.getVisibility() == View.VISIBLE;
-//
-//        if (!isVisible) {
-//            sendButton.setVisibility(View.VISIBLE);
-//            YoYo.with(Techniques.SlideInRight).duration(500).playOn(mainLayout.findViewById(R.id.btn_send));
-//        } else {
-//            YoYo.with(Techniques.ZoomOut).duration(500).playOn(mainLayout.findViewById(R.id.btn_send));
-//        }
-//
-//        if (b) {
-//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-//                sendButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_cross, null));
-//                sendButton.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.colorDelete, null)));
-//            } else {
-//                sendButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_cross));
-//                sendButton.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.colorDelete)));
-//            }
-//        } else {
-//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-//                sendButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_send, null));
-//                sendButton.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.colorPrimary, null)));
-//            } else {
-//                sendButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_send));
-//                sendButton.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.colorPrimary)));
-//            }
-//        }
-//
-//        if (isVisible) {
-//            YoYo.with(Techniques.ZoomIn).delay(500).duration(500).playOn(mainLayout.findViewById(R.id.btn_send));
-//        }
-//    }
-
-//    private void test() {
-//        final UUID uuidStartStop = UUID.fromString(getResources().getString(R.string.start_record_uuid));
-//        final boolean isStarted = ByteArrayUtils.byteArrayToBoolean(characteristics.get(uuidStartStop));
-//
-//        if (isStarted) {
-//            if (isConnected()) {
-//                connectionObservable.flatMap(
-//                        rxBleConnection ->
-//                                rxBleConnection.writeCharacteristic(
-//                                        UUID.fromString(getResources().getString(R.string.start_record_uuid)),
-//                                        ByteArrayUtils.booleanToByteArray(false)
-//                                )
-//                ).subscribe(
-//                        bytes -> {
-//                            Snackbar.make(mainLayout, "Record correctly stopped",
-//                                    Snackbar.LENGTH_LONG).show();
-//                            runOnUiThread(() -> toggleActionButton(ByteArrayUtils.byteArrayToBoolean(bytes)));
-//                            Log.e("TEST", "" + characteristics.get(UUID.fromString(getResources().getString(R.string.start_record_uuid))));
-//                        },
-//                        throwable -> {
-//                            Log.e(getClass().getSimpleName(), "Error occurs : " + throwable.toString());
-//                            Snackbar.make(mainLayout, "Error while trying to stop the record",
-//                                    Snackbar.LENGTH_LONG).show();
-//                        }
-//                );
-//            }
-//        } else {
-//            if (isConnected()) {
-//                connectionObservable.flatMap(
-//                        rxBleConnection ->
-//                                rxBleConnection.writeCharacteristic(
-//                                        UUID.fromString(getResources().getString(R.string.start_record_uuid)),
-//                                        ByteArrayUtils.booleanToByteArray(true)
-//                                )
-//                ).subscribe(
-//                        bytes -> {
-//                            Snackbar.make(mainLayout, "Record correctly started",
-//                                    Snackbar.LENGTH_LONG).show();
-//                            runOnUiThread(() -> toggleActionButton(ByteArrayUtils.byteArrayToBoolean(bytes)));
-//                            Log.e("TEST", "" + characteristics.get(UUID.fromString(getResources().getString(R.string.start_record_uuid))));
-//                        },
-//                        throwable -> {
-//                            Log.e(getClass().getSimpleName(), "Error occurs : " + throwable.toString());
-//                            Snackbar.make(mainLayout, "Error while trying to stop the record",
-//                                    Snackbar.LENGTH_LONG).show();
-//                        }
-//                );
-//            }
-//        }
-//    }
-
-//    private void writeCharacteristics() {
-//        final UUID uuidStartStop = UUID.fromString(getResources().getString(R.string.start_record_uuid));
-//        final boolean isStarted = characteristics.get(uuidStartStop).equals(ByteArrayUtils.booleanToByteArray(true));
-//
-//        if (isConnected()){
-//            if (isStarted) {
-//                connectionObservable.flatMap(
-//                        rxBleConnection ->
-//                                rxBleConnection.writeCharacteristic(
-//                                        UUID.fromString(getResources().getString(R.string.start_record_uuid)),
-//                                        ByteArrayUtils.booleanToByteArray(false)
-//                                )
-//                ).subscribe();
-//            } else {
-//                for (Map.Entry entry : characteristics.entrySet()) {
-//
-//                }
-//            }
-//        }
-//    }
 }

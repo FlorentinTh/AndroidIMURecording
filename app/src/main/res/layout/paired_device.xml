@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<com.daimajia.swipe.SwipeLayout
+<com.daimajia.swipe.SwipeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:swipe="http://schemas.android.com/apk/res-auto"
-    xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/swipe_layout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -12,8 +11,8 @@
         android:id="@+id/bottom_wrapper"
         android:layout_width="match_parent"
         android:layout_height="80dp"
-        android:gravity="center"
-        android:background="@color/colorDelete">
+        android:background="@color/colorDelete"
+        android:gravity="center">
 
         <ImageView
             android:id="@+id/trash"
@@ -32,39 +31,39 @@
 
         <Button
             android:id="@+id/btn_unpair"
+            style="?android:attr/borderlessButtonStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="10"
-            android:textColor="@color/colorPrimaryIconsText"
             android:text="@string/unpair_button_label"
-            style="?android:attr/borderlessButtonStyle" />
+            android:textColor="@color/colorPrimaryIconsText" />
 
     </LinearLayout>
 
     <RelativeLayout
-        android:padding="16dp"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:padding="16dp">
 
         <TextView
             android:id="@+id/name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
+            android:textAllCaps="true"
             android:textColor="@color/colorSecondaryText"
-            android:textSize="16sp"
-            android:textAllCaps="true" />
+            android:textSize="16sp" />
 
 
         <Button
             android:id="@+id/btn_use"
+            style="?android:attr/borderlessButtonStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
             android:layout_alignParentEnd="true"
-            android:textColor="@color/colorPrimary"
+            android:layout_centerVertical="true"
             android:text="@string/use_button_label"
-            style="?android:attr/borderlessButtonStyle" />
+            android:textColor="@color/colorPrimary" />
 
     </RelativeLayout>
 

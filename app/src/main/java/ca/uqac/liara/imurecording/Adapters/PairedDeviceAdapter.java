@@ -30,17 +30,17 @@ public class PairedDeviceAdapter extends BaseSwipeAdapter {
     private OnUseButtonClickListener useListener;
     private OnUnpairButtonClickListener unpairListener;
 
+    public PairedDeviceAdapter(Context context, List<BluetoothDevice> data) {
+        this.context = context;
+        this.data = data;
+    }
+
     public void setOnUseButtonClickListener(@Nullable OnUseButtonClickListener listener) {
         this.useListener = listener;
     }
 
     public void setOnUnpairButtonClickListener(@Nullable OnUnpairButtonClickListener listener) {
         this.unpairListener = listener;
-    }
-
-    public PairedDeviceAdapter(Context context, List<BluetoothDevice> data) {
-        this.context = context;
-        this.data = data;
     }
 
     public void addDevice(BluetoothDevice device) {
@@ -112,21 +112,22 @@ public class PairedDeviceAdapter extends BaseSwipeAdapter {
     }
 
     @Override
-    public void fillValues(int position, View convertView) {}
+    public void fillValues(int position, View convertView) {
+    }
 
     @Override
-    public int getCount() { return data.size(); }
+    public int getCount() {
+        return data.size();
+    }
 
     @Override
-    public Object getItem(int position) { return data.get(position); }
-    
-    @Override
-    public long getItemId(int position) { return data.indexOf(data.get(position)); }
+    public Object getItem(int position) {
+        return data.get(position);
+    }
 
-    public class ViewHolder {
-        public TextView name;
-        public Button useButton;
-        public Button unpairButton;
+    @Override
+    public long getItemId(int position) {
+        return data.indexOf(data.get(position));
     }
 
     public interface OnUseButtonClickListener {
@@ -135,5 +136,11 @@ public class PairedDeviceAdapter extends BaseSwipeAdapter {
 
     public interface OnUnpairButtonClickListener {
         void OnUnpairButtonClick(int position);
+    }
+
+    public class ViewHolder {
+        public TextView name;
+        public Button useButton;
+        public Button unpairButton;
     }
 }

@@ -1,15 +1,20 @@
 <resources>
+    <!--Services UUIDs-->
+    <string name="gps_service">00000b00-0000-1000-8000-00805f9b34fb</string>
+    <string name="weather_service">00000c00-0000-1000-8000-00805f9b34fb</string>
+    <string name="metadata_service">00000d00-0000-1000-8000-00805f9b34fb</string>
+    <string name="imu_service">00000e00-0000-1000-8000-00805f9b34fb</string>
     <!--Characteristics UUIDs-->
-    <string name="hiking_name_uuid">0000d01-0000-1000-8000-00805f9b34fb</string>
-    <string name="start_record_uuid">0000d02-0000-1000-8000-00805f9b34fb</string>
-    <string name="sensor_location_uuid">0000d03-0000-1000-8000-00805f9b34fb</string>
-    <string name="username_uuid">0000d04-0000-1000-8000-00805f9b34fb</string>
+    <string name="hiking_name_uuid">00000d01-0000-1000-8000-00805f9b34fb</string>
+    <string name="start_record_uuid">00000d02-0000-1000-8000-00805f9b34fb</string>
+    <string name="sensor_location_uuid">00000d03-0000-1000-8000-00805f9b34fb</string>
+    <string name="username_uuid">00000d04-0000-1000-8000-00805f9b34fb</string>
     <!--App-->
     <string name="app_name">IMURecording</string>
+    <string name="popup_titles">Houston, we have a problem!</string>
     <!--Main Activity-->
-    <string name="alert_bluetooth_access_denied_title">Bluetooth was not enabled</string>
-    <string name="alert_work_message">The app may not works as expected.</string>
-    <string name="alert_location_permission_denied_title">Location access denied</string>
+    <string name="alert_bluetooth_message">Bluetooth was not enabled. The app may not works as expected.</string>
+    <string name="alert_location_permission_denied_message">Location access denied. The app may not works as expected.</string>
     <string name="device_name_unknown">Unknown</string>
     <string name="device_already_paired">Cannot pair more than one device.</string>
     <string name="default_connection_state_value">Not Paired</string>
@@ -20,10 +25,12 @@
     <string name="unpair_button_label">Unpair</string>
     <string name="action_retry">Retry</string>
     <string name="unpair_confirm_text">The device has been unpaired.</string>
+    <!--SendData Activity-->
     <string name="hiking_name_hint">Hiking name</string>
     <string name="sensor_location_hint">Sensor location</string>
     <string name="username_hint">Username</string>
     <string name="hiking_name_input_invalid">Hiking name cannot be empty  and greater than 20.</string>
     <string name="sensor_location_input_invalid">Sensor location cannot be empty  and greater than 20.</string>
     <string name="username_input_invalid">Username cannot be empty and greater than 20.</string>
+    <string name="device_deconnected_message">Bluetooth device is no longer connected.</string>
 </resources>

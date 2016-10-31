@@ -5,46 +5,45 @@
     android:paddingTop="@dimen/activity_vertical_margin">
 
     <RelativeLayout
-        android:padding="16dp"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:padding="16dp">
 
         <TextView
             android:id="@+id/name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:paddingBottom="3dp"
+            android:textAllCaps="true"
             android:textColor="@color/colorSecondaryText"
-            android:textSize="16sp"
-            android:textAllCaps="true" />
+            android:textSize="16sp" />
 
         <TextView
             android:id="@+id/address"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/name"
-            android:textSize="10sp"
-            android:textAllCaps="true" />
+            android:textAllCaps="true"
+            android:textSize="10sp" />
 
         <TextView
+            android:id="@+id/connection_state"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/connection_state"
+            android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
-            android:textSize="14sp"
-            android:textAllCaps="true"
             android:text="TEST"
-            android:layout_alignParentEnd="true" />
+            android:textAllCaps="true"
+            android:textSize="14sp" />
 
         <ProgressBar
+            android:id="@+id/progress"
             style="?android:attr/progressBarStyleLarge"
             android:layout_width="32dp"
             android:layout_height="32dp"
-            android:id="@+id/progress"
-            android:visibility="invisible"
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
-            />
+            android:visibility="invisible" />
 
     </RelativeLayout>
 

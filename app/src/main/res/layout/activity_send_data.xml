@@ -1,23 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical"
+    android:id="@+id/activity_send_data"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/activity_send_data"
+    android:orientation="vertical"
     tools:context="ca.uqac.liara.imurecording.Activities.BLEDeviceActivity">
 
     <LinearLayout
-        android:layout_above="@+id/btn_layout"
         android:layout_width="match_parent"
-        android:layout_margin="16dp"
         android:layout_height="fill_parent"
-        android:orientation="vertical"
+        android:layout_above="@+id/btn_layout"
+        android:layout_margin="16dp"
         android:focusable="true"
         android:focusableInTouchMode="true"
-        android:gravity="center_horizontal">
+        android:gravity="center_horizontal"
+        android:orientation="vertical">
 
         <android.support.design.widget.TextInputLayout
             android:id="@+id/hiking_name"
@@ -26,49 +25,49 @@
             android:layout_marginTop="16dp"
             android:theme="@style/Inputs">
 
-            <EditText
+            <android.support.design.widget.TextInputEditText
                 android:id="@+id/hiking_name_input"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/hiking_name_hint"
                 android:inputType="text"
-                android:textAllCaps="true"/>
+                android:textAllCaps="true" />
 
         </android.support.design.widget.TextInputLayout>
 
         <android.support.design.widget.TextInputLayout
             android:id="@+id/sensor_location"
-            android:layout_below="@+id/hiking_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_below="@+id/hiking_name"
             android:layout_marginTop="50dp"
             android:theme="@style/Inputs">
 
-            <EditText
+            <android.support.design.widget.TextInputEditText
                 android:id="@+id/sensor_location_input"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/sensor_location_hint"
                 android:inputType="text"
-                android:textAllCaps="true"/>
+                android:textAllCaps="true" />
 
         </android.support.design.widget.TextInputLayout>
 
         <android.support.design.widget.TextInputLayout
             android:id="@+id/username"
-            android:layout_below="@+id/sensor_location"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_below="@+id/sensor_location"
             android:layout_marginTop="50dp"
             android:theme="@style/Inputs">
 
-            <EditText
+            <android.support.design.widget.TextInputEditText
                 android:id="@+id/username_input"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/username_hint"
                 android:inputType="textPersonName"
-                android:textAllCaps="true"/>
+                android:textAllCaps="true" />
 
         </android.support.design.widget.TextInputLayout>
 
@@ -76,26 +75,26 @@
 
     <LinearLayout
         android:id="@id/btn_layout"
-        android:layout_height="wrap_content"
         android:layout_width="fill_parent"
-        android:orientation="horizontal"
-        android:gravity="bottom|right"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"
         android:clipChildren="false"
         android:clipToPadding="false"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentStart="true">
+        android:gravity="bottom|right"
+        android:orientation="horizontal">
 
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/btn_send"
-
-            android:layout_margin="28dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_margin="28dp"
+            android:visibility="invisible"
             app:backgroundTint="@color/colorPrimary"
-            app:rippleColor="@color/colorPrimaryDark"
-            app:fabSize="normal"
+            app:borderWidth="0dp"
             app:elevation="5dp"
-            app:borderWidth="0dp"/>
+            app:fabSize="normal"
+            app:rippleColor="@color/colorPrimaryDark" />
 
     </LinearLayout>
 
