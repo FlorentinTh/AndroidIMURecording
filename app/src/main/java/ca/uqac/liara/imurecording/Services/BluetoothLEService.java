@@ -247,6 +247,7 @@ public class BluetoothLEService extends Service {
         return bluetoothGatt.getService(UUID.fromString(uuidService)).getCharacteristic(UUID.fromString(uuidCharacteristic));
     }
 
+
     public class LocalBinder extends Binder {
         public BluetoothLEService getService() {
             return BluetoothLEService.this;
