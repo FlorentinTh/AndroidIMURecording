@@ -10,4 +10,6 @@
     <color name="colorAccent">#448AFF</color>
     <color name="colorDelete">#F44336</color>
     <color name="colorSuccess">#4CAF50</color>
+    <color name="colorSuccessDark">#2E7D32</color>
+    <color name="colorSuccessAccent">#66BB6A</color>
 </resources>

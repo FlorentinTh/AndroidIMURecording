@@ -11,6 +11,7 @@ import android.content.ServiceConnection;
 import android.content.res.ColorStateList;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TextInputEditText;
@@ -25,6 +26,8 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
 
+import com.github.jorgecastilloprz.FABProgressCircle;
+
 import java.util.HashMap;
 import java.util.List;
 
@@ -34,10 +37,16 @@ import ca.uqac.liara.imurecording.Utils.ByteArrayUtils;
 
 public class SendDataActivity extends AppCompatActivity {
 
+    private static final long TIMEOUT = 5000;
+
     private RelativeLayout layout;
     private TextInputLayout hikingNameLayout, sensorLocationLayout, usernameLayout;
     private TextInputEditText hikingNameInput, sensorLocationInput, usernameInput;
+    private FABProgressCircle startStopButton;
     private FloatingActionButton sendButton;
+
+    private Handler handler;
+
     private final BroadcastReceiver gattUpdateReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -87,6 +96,7 @@ public class SendDataActivity extends AppCompatActivity {
         getDataFromActivity();
         initGUI();
         initListeners();
+        handler = new Handler();
         toggleView(isRecording);
     }
 
@@ -142,6 +152,7 @@ public class SendDataActivity extends AppCompatActivity {
         usernameInput = (TextInputEditText) findViewById(R.id.username_input);
         usernameLayout.setError(getResources().getString(R.string.username_input_invalid));
 
+        startStopButton = (FABProgressCircle) findViewById(R.id.btn_start_stop);
         sendButton = (FloatingActionButton) findViewById(R.id.btn_send);
 
         this.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -302,6 +313,8 @@ public class SendDataActivity extends AppCompatActivity {
     private void writeData(final String hikingName, final String sensorLocation, final String username) {
         data.clear();
 
+        startStopButton.hide();
+
         if (isRecording) {
             isRecording = false;
 
@@ -311,6 +324,10 @@ public class SendDataActivity extends AppCompatActivity {
                             getResources().getString(R.string.start_record_uuid)),
                     ByteArrayUtils.booleanToByteArray(isRecording)
             );
+
+            bluetoothLEService.setCharacteristics(data);
+            bluetoothLEService.writeCharacteristics();
+
         } else {
             isRecording = true;
 
@@ -350,9 +367,15 @@ public class SendDataActivity extends AppCompatActivity {
                     );
                 }
             }
+
+            startStopButton.show();
+
+            handler.postDelayed(() -> {
+                startStopButton.hide();
+                bluetoothLEService.setCharacteristics(data);
+                bluetoothLEService.writeCharacteristics();
+            }, TIMEOUT);
         }
-        bluetoothLEService.setCharacteristics(data);
-        bluetoothLEService.writeCharacteristics();
     }
 
     private void showAlertDialogFinishOnDismiss(final String title, final String message) {
