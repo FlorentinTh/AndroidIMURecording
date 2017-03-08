@@ -1,5 +1,8 @@
 language: android
 
+notifications:
+  email: false
+
 jdk:
   - oraclejdk8
 
@@ -27,7 +30,6 @@ env:
       #- ANDROID_TARGET=android-25
 
 before_script:
-    - android list target
     - echo no | android create avd --force -n test -t $ANDROID_TARGET  --abi armeabi-v7a
     - emulator -avd test -no-skin -no-audio -no-window &
     - android-wait-for-emulator
