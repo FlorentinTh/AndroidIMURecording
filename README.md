@@ -14,10 +14,10 @@ Android app that aims at controlling the record of IMU data from the wearable de
 
 ## Related Papers
 
-- [A Comparison of Inertial Data Acquisition Methods for a Position-Independent Soil Types Recognition](contributions/2018/contribution-6/src/manuscript.pdf) in 2018 IEEE 15th International Conference on Ubiquitous Intelligence and Computing (UIC), p. 1052-1056, October 2018, IEEE.
+- [A Comparison of Inertial Data Acquisition Methods for a Position-Independent Soil Types Recognition](https://github.com/FlorentinTh/Contributions-Public/blob/master/contributions/2018/contribution-6/src/manuscript.pdf) in 2018 IEEE 15th International Conference on Ubiquitous Intelligence and Computing (UIC), p. 1052-1056, October 2018, IEEE.
   - **Authors:** _Florentin Thullier, Valère Plantevin, Abdenour Bouzouane, Sébastien Gaboury, Sylvain Hallé._
 
-- [A Position-Independent Method for Soil Types Recognition Using Inertial Data from a Wearable Device](contributions/2017/contribution-4/src/manuscript.pdf) in 2017 IEEE 14th International Conference on Ubiquitous Intelligence and Computing (UIC), p. 4, August 2017, IEEE.
+- [A Position-Independent Method for Soil Types Recognition Using Inertial Data from a Wearable Device](https://github.com/FlorentinTh/Contributions-Public/blob/master/contributions/2017/contribution-4/src/manuscript.pdf) in 2017 IEEE 14th International Conference on Ubiquitous Intelligence and Computing (UIC), p. 4, August 2017, IEEE.
   - **Authors:** _Florentin Thullier, Valère Plantevin, Abdenour Bouzouane, Sébastien Gaboury, Sylvain Hallé._
 
 ## Related Repositories
