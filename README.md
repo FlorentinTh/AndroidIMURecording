@@ -12,7 +12,7 @@ Android app that aims at controlling the record of IMU data from the wearable de
 
 **[Florentin Thullier](https://github.com/florentinth)** - _2016_
 
-## Related papers
+## Related Papers
 
 - [A Comparison of Inertial Data Acquisition Methods for a Position-Independent Soil Types Recognition](contributions/2018/contribution-6/src/manuscript.pdf) in 2018 IEEE 15th International Conference on Ubiquitous Intelligence and Computing (UIC), p. 1052-1056, October 2018, IEEE.
   - **Authors:** _Florentin Thullier, Valère Plantevin, Abdenour Bouzouane, Sébastien Gaboury, Sylvain Hallé._
@@ -20,11 +20,9 @@ Android app that aims at controlling the record of IMU data from the wearable de
 - [A Position-Independent Method for Soil Types Recognition Using Inertial Data from a Wearable Device](contributions/2017/contribution-4/src/manuscript.pdf) in 2017 IEEE 14th International Conference on Ubiquitous Intelligence and Computing (UIC), p. 4, August 2017, IEEE.
   - **Authors:** _Florentin Thullier, Valère Plantevin, Abdenour Bouzouane, Sébastien Gaboury, Sylvain Hallé._
 
-## Related repositories
+## Related Repositories
 
 - [SoilTypesRecognition-WearableFirmware](https://github.com/FlorentinTh/SoilTypesRecognition-WearableFirmware)
-
-- [SoilTypesRecognition-AndroidAppDriver](https://github.com/FlorentinTh/SoilTypesRecognition-AndroidAppDriver)
 
 - [SoilTypesRecognition-AndroidAppRecording](https://github.com/FlorentinTh/SoilTypesRecognition-AndroidAppRecording)
 
