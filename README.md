@@ -28,8 +28,8 @@ Android app that aims at controlling the record of IMU data from the wearable de
 
 - [SoilTypesRecognition-AndroidAppRecording](https://github.com/FlorentinTh/SoilTypesRecognition-AndroidAppRecording)
 
-License
----
+## License
+
     Copyright 2016 Florentin Thullier.
 
     Licensed under the Apache License, Version 2.0 (the "License");
