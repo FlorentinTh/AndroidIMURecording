@@ -6,19 +6,27 @@
 
 ---
 
-Android app that aims at controlling the record of IMU data from the hiking device based on Arduino 101 board (c.f. firmware **[1]**). 
+Android app that aims at controlling the record of IMU data from the wearable device based on Arduino 101 board to recognize soil types.
 
-Related paper
----
-_link comming soon_
+## Author
 
-Author
--------
 **[Florentin Thullier](https://github.com/florentinth)** - _2016_
 
-References
----
-**[1]** [Hiking](https://github.com/FlorentinTh/Hiking)
+## Related papers
+
+- [A Comparison of Inertial Data Acquisition Methods for a Position-Independent Soil Types Recognition](contributions/2018/contribution-6/src/manuscript.pdf) in 2018 IEEE 15th International Conference on Ubiquitous Intelligence and Computing (UIC), p. 1052-1056, October 2018, IEEE.
+  - **Authors:** _Florentin Thullier, Valère Plantevin, Abdenour Bouzouane, Sébastien Gaboury, Sylvain Hallé._
+
+- [A Position-Independent Method for Soil Types Recognition Using Inertial Data from a Wearable Device](contributions/2017/contribution-4/src/manuscript.pdf) in 2017 IEEE 14th International Conference on Ubiquitous Intelligence and Computing (UIC), p. 4, August 2017, IEEE.
+  - **Authors:** _Florentin Thullier, Valère Plantevin, Abdenour Bouzouane, Sébastien Gaboury, Sylvain Hallé._
+
+## Related repositories
+
+- [SoilTypesRecognition-WearableFirmware](https://github.com/FlorentinTh/SoilTypesRecognitionWearable-Firmware)
+
+- [SoilTypesRecognition-AndroidAppDriver](https://github.com/FlorentinTh/SoilTypesRecognition-AndroidAppDriver)
+
+- [SoilTypesRecognition-AndroidAppRecording](https://github.com/FlorentinTh/SoilTypesRecognition-AndroidAppRecording)
 
 License
 ---
