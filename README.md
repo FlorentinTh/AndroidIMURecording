@@ -22,7 +22,7 @@ Android app that aims at controlling the record of IMU data from the wearable de
 
 ## Related repositories
 
-- [SoilTypesRecognition-WearableFirmware](https://github.com/FlorentinTh/SoilTypesRecognitionWearable-Firmware)
+- [SoilTypesRecognition-WearableFirmware](https://github.com/FlorentinTh/SoilTypesRecognition-WearableFirmware)
 
 - [SoilTypesRecognition-AndroidAppDriver](https://github.com/FlorentinTh/SoilTypesRecognition-AndroidAppDriver)
 
