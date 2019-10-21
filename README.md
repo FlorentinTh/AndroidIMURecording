@@ -1,4 +1,4 @@
-# IMURecording
+# SoilTypesRecognition-AndroidAppDriver
 
 [![Build Status](https://travis-ci.org/FlorentinTh/AndroidIMURecording.svg?branch=master)](https://travis-ci.org/FlorentinTh/AndroidIMURecording)
 [![API](https://img.shields.io/badge/API-18%2B-orange.svg)](https://source.android.com/source/build-numbers.html)
